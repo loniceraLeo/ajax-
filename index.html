@@ -1,0 +1,51 @@
+//客户端文件，放置在同一目录下
+//下载node.js
+//本地运行node.js $node server-side.js
+//在浏览器中输入:localhost:1000/就可以进入聊天室
+//可以查看localhost:1000/chat
+<!DOCTYPE html>
+<html>
+<head>
+	<title>quq</title>
+	<script type="text/javascript">"uses strict"</script>
+	<link href='favicon.ico' rel="shortcut icon">
+	<meta charset="utf-8">
+	<title>myChat</title>
+	<style type="text/css">
+
+	</style>
+</head>
+<body>
+<input type="input" name="" style="width: 100%">
+	<script type="text/javascript">
+		window.onload=$=>{
+			let nickname=prompt('昵称:');
+			let doc=document;
+			let clog=console.log;
+			let es=new EventSource('/chat');      //访问服务器的url 会抛出一个GET请求
+			es.onopen=$=>clog('EventSource已经实例化');
+		
+			es.onmessage=$=>{
+				let text=$.data;
+				clog($.data);
+				let textNode=doc.createTextNode(text);
+				let div=doc.createElement('div');
+				div.appendChild(textNode);
+				doc.body.insertBefore(div,input);
+			}
+			es.onerror=$=>clog('错误');
+			let input=doc.getElementsByTagName('input')[0];
+			input.focus();
+			input.onchange=$=>{
+				let data=input.value;
+				let xhr=new XMLHttpRequest();
+				xhr.open('POST','/chat',true);
+				xhr.setRequestHeader('Content-type','text/plain;charset=utf8');
+				xhr.send(nickname+':'+data);
+				xhr.abort();                  //注意终止ajax请求实现轮询
+				input.value='';
+			}
+		}
+	</script>
+</body>
+</html><!--33.23
