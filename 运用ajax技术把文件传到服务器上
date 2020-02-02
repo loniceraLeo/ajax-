@@ -1,0 +1,27 @@
+十分激动，今天自行解决了一个困扰我很久的问题。
+
+学会node.js后，我终于可以通过浏览器打开我的客户端页面了，但是我引用的图片全都不见了...百度上一顿爆搜，回答也都是模棱两可。我知道这个问题的根源:
+“同源策略”。让客户端直接加载本地文件是不安全的，但是这个问题始终没有得到解决，因为我不知道如何把文件传到服务器上。
+
+其实答案很简单。我的解决方法是:使用ajax。
+先 let xhr=new XMLHttpRequest() 创建一个请求实例。
+然后 xhr.open('GET','/pic.jpg); 抛出一个GET请求。目标url是pic.jpg，这个名字可以自取,不带后缀也行。
+然后 xhr.setRequestHeader('Content-Type','text/plain);完善请求头，实际可以省略这行
+最后 xhr.send(); xhr.abort(); 不需要请求主体。
+客户端的工作做完了。
+
+在node.js中(其他语言我不清楚，因为没学过...)
+先加载图片文件
+let fs=require('fs');
+let pic=fs.readFileSync('pic.jpg');//假设文件与url同名
+
+if (req.url==='/pic.jpg'){
+  res.writeHead(200,'ok',{'Content-Type':'image/jpeg'});
+  res.end(pic);
+}
+大功告成。
+
+接下来，我们启动浏览器，输入"http://localhost:1000/pic.jpg"回车
+我们就可以看到这张图片了。
+
+p.s.图片文件多的时候，我们不可能创建很多xhr实例。我们可以把url定为'image'。后面使用查询字符串。
